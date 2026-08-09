@@ -2,39 +2,41 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreAnggotaRequest;
+use App\Http\Requests\UpdateAnggotaRequest;
+use App\Http\Resources\AnggotaResource;
 use App\Models\Anggota;
-use Illuminate\Http\Request;
 
 class AnggotaController extends Controller
 {
     public function index()
     {
-        return Anggota::all();
+        return AnggotaResource::collection(Anggota::all());
     }
 
     public function show(string $id)
     {
-        return Anggota::findOrFail($id);
+        return new AnggotaResource(Anggota::findOrFail($id));
     }
 
-    public function store(Request $request)
+    public function store(StoreAnggotaRequest $request)
     {
-        $anggota = Anggota::create($request->all());
+        $anggota = Anggota::create($request->validated());
 
         return response()->json([
             'message' => 'Anggota berhasil ditambahkan',
-            'data' => $anggota,
+            'data' => new AnggotaResource($anggota),
         ], 201);
     }
 
-    public function update(Request $request, string $id)
+    public function update(UpdateAnggotaRequest $request, string $id)
     {
         $anggota = Anggota::findOrFail($id);
-        $anggota->update($request->all());
+        $anggota->update($request->validated());
 
         return response()->json([
             'message' => 'Anggota berhasil diupdate',
-            'data' => $anggota,
+            'data' => new AnggotaResource($anggota),
         ]);
     }
 
