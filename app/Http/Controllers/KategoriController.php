@@ -16,32 +16,49 @@ class KategoriController extends Controller
 
     public function index()
     {
-        return $this->success(KategoriResource::collection($this->kategoriService->index()));
-    }
+        $kategori = $this->kategoriService->index();
 
-    public function show(string $id)
-    {
-        return $this->success(new KategoriResource($this->kategoriService->show($id)));
+        return $this->success(
+            KategoriResource::collection($kategori),
+            'Daftar kategori berhasil diambil.'
+        );
     }
 
     public function store(StoreKategoriRequest $request)
     {
         $kategori = $this->kategoriService->store($request->validated());
 
-        return $this->success(new KategoriResource($kategori), 'Kategori berhasil ditambahkan', 201);
+        return $this->success(
+            new KategoriResource($kategori),
+            'Kategori berhasil ditambahkan.',
+            201
+        );
+    }
+
+    public function show(string $id)
+    {
+        $kategori = $this->kategoriService->show($id);
+
+        return $this->success(
+            new KategoriResource($kategori),
+            'Detail kategori berhasil diambil.'
+        );
     }
 
     public function update(UpdateKategoriRequest $request, string $id)
     {
         $kategori = $this->kategoriService->update($id, $request->validated());
 
-        return $this->success(new KategoriResource($kategori), 'Kategori berhasil diupdate');
+        return $this->success(
+            new KategoriResource($kategori),
+            'Kategori berhasil diperbarui.'
+        );
     }
 
     public function destroy(string $id)
     {
         $this->kategoriService->destroy($id);
 
-        return $this->success(null, 'Kategori berhasil dihapus');
+        return $this->success(null, 'Kategori berhasil dihapus.');
     }
 }

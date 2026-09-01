@@ -4,8 +4,10 @@ namespace App\Services;
 
 use App\Models\Komik;
 use App\Models\Peminjaman;
-use Exception;
+use RuntimeException;
+use DomainException;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 
 class PeminjamanService
 {
@@ -24,39 +26,28 @@ class PeminjamanService
         $komik = Komik::findOrFail($data['komik_id']);
 
         if ($komik->stok < 1) {
-            throw new Exception('Stok komik habis, tidak bisa dipinjam');
+            throw new RuntimeException('Stok komik habis');
         }
 
-        $peminjaman = Peminjaman::create([
-            'anggota_id' => $data['anggota_id'],
-            'komik_id' => $data['komik_id'],
-            'tanggal_pinjam' => $data['tanggal_pinjam'] ?? now()->toDateString(),
-            'tanggal_kembali' => $data['tanggal_kembali'] ?? null,
-            'status' => $data['status'] ?? 'dipinjam',
-        ]);
+        return DB::transaction(function () use ($data, $komik) {
+            $peminjaman = Peminjaman::create([
+                'anggota_id' => $data['anggota_id'],
+                'komik_id' => $data['komik_id'],
+                'tanggal_pinjam' => $data['tanggal_pinjam'],
+                'status' => 'dipinjam',
+            ]);
 
-        $komik->decrement('stok');
+            $komik->decrement('stok');
 
-        return $peminjaman->load(['anggota', 'komik']);
-    }
+        return $peminjaman->fresh(['anggota', 'komik']);
+    });
+}
 
     public function update(string|int $id, array $data): Peminjaman
     {
         $peminjaman = Peminjaman::findOrFail($id);
-
-        $statusSebelum = $peminjaman->status;
-
         $peminjaman->update($data);
-
-        if (isset($data['status']) && $data['status'] === 'dikembalikan' && $statusSebelum !== 'dikembalikan') {
-            $peminjaman->komik()->increment('stok');
-        }
-
-        if (isset($data['status']) && $data['status'] !== 'dikembalikan' && $statusSebelum === 'dikembalikan') {
-            $peminjaman->komik()->decrement('stok');
-        }
-
-        return $peminjaman->fresh()->load(['anggota', 'komik']);
+        return $peminjaman->fresh(['anggota', 'komik']);
     }
 
     public function kembali(string|int $id): Peminjaman
@@ -64,26 +55,23 @@ class PeminjamanService
         $peminjaman = Peminjaman::findOrFail($id);
 
         if ($peminjaman->status === 'dikembalikan') {
-            throw new Exception('Peminjaman ini sudah dikembalikan');
+            throw new DomainException('Peminjaman ini sudah dikembalikan');
         }
 
-        $peminjaman->status = 'dikembalikan';
-        $peminjaman->tanggal_kembali = $peminjaman->tanggal_kembali ?? now()->toDateString();
-        $peminjaman->save();
+        return DB::transaction(function () use ($peminjaman) {
+            $peminjaman->update([
+                'tanggal_kembali' => now()->toDateString(),
+                'status' => 'dikembalikan',
+            ]);
 
-        $peminjaman->komik()->increment('stok');
+            Komik::find($peminjaman->komik_id)->increment('stok');
 
-        return $peminjaman->fresh()->load(['anggota', 'komik']);
+            return $peminjaman->fresh(['anggota', 'komik']);
+        });
     }
 
-    public function destroy(string|int $id): bool
+    public function destroy(string|int $id): void
     {
-        $peminjaman = Peminjaman::findOrFail($id);
-
-        if ($peminjaman->status !== 'dikembalikan') {
-            $peminjaman->komik()->increment('stok');
-        }
-
-        return (bool) $peminjaman->delete();
+        Peminjaman::findOrFail($id)->delete();
     }
 }

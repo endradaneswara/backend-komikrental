@@ -30,10 +30,8 @@ class AnggotaService
         return $anggota->fresh();
     }
 
-    public function destroy(string|int $id): bool
+    public function destroy(string|int $id): void
     {
-        $anggota = Anggota::findOrFail($id);
-
-        return (bool) $anggota->delete();
+        Anggota::findOrFail($id)->delete();
     }
 }

@@ -17,13 +17,7 @@ class UpdateKategoriRequest extends FormRequest
         $kategoriId = $this->route('kategori');
 
         return [
-            'nama_kategori' => [
-                'sometimes',
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('kategori', 'nama_kategori')->ignore($kategoriId),
-            ],
+            'nama_kategori' => ['required', 'string', 'max:100'],
         ];
     }
 }

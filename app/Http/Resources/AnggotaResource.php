@@ -16,6 +16,7 @@ class AnggotaResource extends JsonResource
             'alamat' => $this->maskAddress($this->alamat),
             'tanggal_daftar' => $this->tanggal_daftar,
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
         ];
     }
 

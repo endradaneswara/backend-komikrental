@@ -17,8 +17,6 @@ class StorePeminjamanRequest extends FormRequest
             'anggota_id' => ['required', 'exists:anggota,id'],
             'komik_id' => ['required', 'exists:komiks,id'],
             'tanggal_pinjam' => ['required', 'date'],
-            'tanggal_kembali' => ['required', 'date', 'after_or_equal:tanggal_pinjam'],
-            'status' => ['nullable', 'in:dipinjam,dikembalikan'],
         ];
     }
 }

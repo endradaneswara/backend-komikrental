@@ -12,15 +12,9 @@ class PeminjamanResource extends JsonResource
         return [
             'id' => $this->id,
             'anggota_id' => $this->anggota_id,
-            'anggota' => $this->whenLoaded('anggota', fn () => [
-                'id' => $this->anggota?->id,
-                'nama' => $this->anggota?->nama,
-            ]),
             'komik_id' => $this->komik_id,
-            'komik' => $this->whenLoaded('komik', fn () => [
-                'id' => $this->komik?->id,
-                'judul' => $this->komik?->judul,
-            ]),
+            'nama_anggota'=> $this->whenLoaded('anggota', fn () => $this->anggota?->nama), 
+            'judul_komik'=> $this->whenLoaded('komik', fn () => $this->komik?->judul),
             'tanggal_pinjam' => $this->tanggal_pinjam,
             'tanggal_kembali' => $this->tanggal_kembali,
             'status' => $this->status,

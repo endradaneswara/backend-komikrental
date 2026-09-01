@@ -7,12 +7,18 @@ use App\Http\Controllers\KomikController;
 use App\Http\Controllers\PeminjamanController;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/login', [AuthController::class, 'login']);
+// Endpoint publik untuk login
+Route::post('/login', [AuthController::class, 'login'])->name('login');
 
-Route::middleware('auth:sanctum')->group(function (): void {
+// Route yang memerlukan autentikasi Sanctum
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
+
     Route::apiResource('kategori', KategoriController::class);
-    Route::apiResource('komiks', KomikController::class);
+    Route::apiResource('komik', KomikController::class);
     Route::apiResource('anggota', AnggotaController::class);
     Route::apiResource('peminjaman', PeminjamanController::class);
-    Route::post('/peminjaman/{id}/kembali', [PeminjamanController::class, 'kembali']);
+
+    // Endpoint tambahan untuk pengembalian komik
+    Route::put('/peminjaman/{id}/kembali', [PeminjamanController::class, 'kembali']);
 });

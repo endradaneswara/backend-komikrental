@@ -16,32 +16,49 @@ class AnggotaController extends Controller
 
     public function index()
     {
-        return $this->success(AnggotaResource::collection($this->anggotaService->index()));
-    }
+        $anggota = $this->anggotaService->index();
 
-    public function show(string $id)
-    {
-        return $this->success(new AnggotaResource($this->anggotaService->show($id)));
+        return $this->success(
+            AnggotaResource::collection($anggota),
+            'Daftar anggota berhasil diambil.'
+        );
     }
 
     public function store(StoreAnggotaRequest $request)
     {
         $anggota = $this->anggotaService->store($request->validated());
 
-        return $this->success(new AnggotaResource($anggota), 'Anggota berhasil ditambahkan', 201);
+        return $this->success(
+            new AnggotaResource($anggota),
+            'Anggota berhasil ditambahkan.',
+            201
+        );
+    }
+
+    public function show(string $id)
+    {
+        $anggota = $this->anggotaService->show($id);
+
+        return $this->success(
+            new AnggotaResource($anggota),
+            'Detail anggota berhasil diambil.'
+        );
     }
 
     public function update(UpdateAnggotaRequest $request, string $id)
     {
         $anggota = $this->anggotaService->update($id, $request->validated());
 
-        return $this->success(new AnggotaResource($anggota), 'Anggota berhasil diupdate');
+        return $this->success(
+            new AnggotaResource($anggota),
+            'Anggota berhasil diperbarui.'
+        );
     }
 
     public function destroy(string $id)
     {
         $this->anggotaService->destroy($id);
 
-        return $this->success(null, 'Anggota berhasil dihapus');
+        return $this->success(null, 'Anggota berhasil dihapus.');
     }
 }

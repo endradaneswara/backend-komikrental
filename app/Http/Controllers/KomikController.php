@@ -16,32 +16,61 @@ class KomikController extends Controller
 
     public function index()
     {
-        return $this->success(KomikResource::collection($this->komikService->getAll()));
-    }
+        $komiks = $this->komikService->index();
 
-    public function show(string $id)
-    {
-        return $this->success(new KomikResource($this->komikService->getById($id)));
+        return $this->success(
+            KomikResource::collection($komiks),
+            'Daftar komik berhasil diambil.'
+        );
     }
 
     public function store(StoreKomikRequest $request)
     {
-        $komik = $this->komikService->store($request->validated());
+        $data = $request->safe()->except('file_pdf');
 
-        return $this->success(new KomikResource($komik), 'Komik berhasil ditambahkan', 201);
+        if ($request->hasFile('file_pdf')) {
+            $data['file_pdf'] = $request->file('file_pdf')->store('komiks', 'public');
+        }
+
+        $komik = $this->komikService->store($data);
+
+        return $this->success(
+            new KomikResource($komik),
+            'Komik berhasil ditambahkan.',
+            201
+        );
+    }
+
+    public function show(string $id)
+    {
+        $komik = $this->komikService->show($id);
+
+        return $this->success(
+            new KomikResource($komik),
+            'Detail komik berhasil diambil.'
+        );
     }
 
     public function update(UpdateKomikRequest $request, string $id)
     {
-        $komik = $this->komikService->update($id, $request->validated());
+        $data = $request->safe()->except('file_pdf');
 
-        return $this->success(new KomikResource($komik), 'Komik berhasil diupdate');
+        if ($request->hasFile('file_pdf')) {
+            $data['file_pdf'] = $request->file('file_pdf')->store('komiks', 'public');
+        }
+
+        $komik = $this->komikService->update($id, $data);
+
+        return $this->success(
+            new KomikResource($komik),
+            'Komik berhasil diperbarui.'
+        );
     }
 
     public function destroy(string $id)
     {
         $this->komikService->destroy($id);
 
-        return $this->success(null, 'Komik berhasil dihapus');
+        return $this->success(null, 'Komik berhasil dihapus.');
     }
 }

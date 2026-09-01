@@ -14,10 +14,12 @@ class KomikResource extends JsonResource
             'judul' => $this->judul,
             'penulis' => $this->penulis,
             'kategori_id' => $this->kategori_id,
+            'nama_kategori' => $this->whenLoaded('kategori', fn() => $this->kategori?->nama_kategori),
             'stok' => $this->stok,
             'status' => $this->status,
             'file_pdf' => $this->file_pdf ? asset('storage/' . $this->file_pdf) : null,
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
         ];
     }
 }

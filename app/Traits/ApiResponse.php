@@ -4,20 +4,20 @@ namespace App\Traits;
 
 trait ApiResponse 
 { 
-    protected function success($data, string $message = 'Berhasil', int $code = 200) 
+    protected function success(mixed $data = null, string $message = 'Berhasil.', int $status = 200) 
     { 
         return response()->json([ 
             'success' => true, 
             'message' => $message, 
             'data' => $data, 
-        ], $code); 
+        ], $status); 
     } 
     
-    protected function error(string $message, int $code = 400) 
+    protected function error(string $message = 'Terjadi Kesalahan.', int $status = 400) 
     { 
         return response()->json([ 
             'success' => false, 
             'message' => $message, 
-        ], $code); 
+        ], $status); 
     }
 }

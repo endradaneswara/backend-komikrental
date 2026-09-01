@@ -16,8 +16,8 @@ return new class extends Migration
             $table->unsignedBigInteger('anggota_id');
             $table->unsignedBigInteger('komik_id');
             $table->date('tanggal_pinjam');
-            $table->date('tanggal_kembali');
-            $table->enum('status', ['dipinjam', 'dikembalikan'])->default('dipinjam');
+            $table->date('tanggal_kembali')->nullable();
+            $table->enum('status', ['dipinjam', 'dikembalikan', 'telat'])->default('dipinjam');
             $table->timestamps();
         });
     }

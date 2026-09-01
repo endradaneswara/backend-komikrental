@@ -30,10 +30,8 @@ class KategoriService
         return $kategori->fresh();
     }
 
-    public function destroy(string|int $id): bool
+    public function destroy(string|int $id): void
     {
-        $kategori = Kategori::findOrFail($id);
-
-        return (bool) $kategori->delete();
+        Kategori::findOrFail($id)->delete();
     }
 }
